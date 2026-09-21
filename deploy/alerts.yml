@@ -61,7 +61,20 @@ groups:
         annotations: { summary: "{{ $labels.host }} battery {{ $value }}%" }
 
       - alert: BatteryStale
-        expr: time() - node_textfile_mtime_seconds{file="battery.prom"} > 300
+        expr: time() - node_textfile_mtime_seconds{file="termux.prom"} > 300
         for: 5m
         labels: { severity: warning }
-        annotations: { summary: "{{ $labels.host }} battery.prom not updated (crond?)" }
+        annotations: { summary: "{{ $labels.host }} termux.prom not updated (crond?)" }
+
+      - alert: HighLoad
+        expr: termux_load15 > 6
+        for: 30m
+        labels: { severity: warning }
+        annotations: { summary: "{{ $labels.host }} load15 {{ $value }} for 30m" }
+
+      # cpu busy per core = 1 - rate(idle); "1 - rate(termux_cpu_idle_seconds_total[5m])" in grafana
+      - alert: CpuPegged
+        expr: avg by (host) (1 - rate(termux_cpu_idle_seconds_total[10m])) > 0.9
+        for: 30m
+        labels: { severity: warning }
+        annotations: { summary: "{{ $labels.host }} cpu > 90% for 30m" }

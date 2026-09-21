@@ -13,7 +13,7 @@ to ntfy (account-free, ntfy formats Alertmanager's JSON itself, no bridge).
 │ prometheus :9090 ──► alertmanager :9093 ──► ntfy.sh    │ ◄──ssh─┤ cron */30 deadman.sh│
 │   │  scrape                                            │        │  ntfy if unreachable│
 │   ├──► node_exporter :9100  (meminfo, /data, cpufreq,  │        └─────────────────────┘
-│   │       textfile: battery + cpu thermal, cron */1)   │
+│   │       textfile: battery, load, cpu idle, thermal)   │
 │   └──► blackbox :9115 ── http/tcp ──► haproxy :8443 ──► anubis ──► shoko :8111 / mealprep :8090
 │                                       nfs :2049, sshd :8022, syncthing :8384
 └────────────────────────────────────────────────────────┘
@@ -21,18 +21,18 @@ to ntfy (account-free, ntfy formats Alertmanager's JSON itself, no bridge).
 
 Nagios → here: NRPE = `node_exporter` on each host; check_http/tcp/ssl =
 `blackbox_exporter` from the monitor; service checks = rules in
-`alerts.yml`; notification commands = Alertmanager receivers; `battery.sh` =
-a custom check via the textfile collector.
+`alerts.yml`; notification commands = Alertmanager receivers; `textfile.sh` =
+custom checks via the textfile collector.
 
 ## Layout
 
 ```txt
 deploy/fetch.sh              downloads an upstream linux-arm64 build into ~/monitoring/bin
 deploy/prometheus.yml        scrape targets: node on both phones, blackbox http/tcp
-deploy/alerts.yml            rules: down, probe failed, cert < 14d, disk, thermal, swap, battery
+deploy/alerts.yml            rules: down, probe failed, cert < 14d, disk, thermal, swap, load, cpu, battery
 deploy/alertmanager.yml      route everything to ntfy, drop Watchdog; topic url read from ~/monitoring/ntfy.url
 deploy/blackbox.yml          http_2xx (follows redirects), tcp_connect
-deploy/battery.sh            cron */1: termux-battery-status -> ~/monitoring/textfile/battery.prom
+deploy/textfile.sh           cron */1: battery, load (sysinfo), cpu idle (cpuidle sysfs), thermal -> ~/monitoring/textfile/termux.prom
 deploy/sv-*.run              runit services
 deploy/deadman.sh            workstation cron: ntfy when the Poco's Prometheus is unreachable
 ```
@@ -42,7 +42,7 @@ On the Poco, outside the repo: `~/monitoring/{bin,data,alertmanager,textfile}`,
 
 ## Install
 
-### Poco: node_exporter + battery
+### Poco: node_exporter + textfile.sh
 
 ```sh
 pkg install termux-services termux-api python    # termux-api needs the Termux:API app too
@@ -51,15 +51,19 @@ git clone https://github.com/sandravwc/monitoring ~/monitoring/repo
 mkdir -p ~/monitoring/textfile $PREFIX/var/service/node-exporter
 cp ~/monitoring/repo/deploy/sv-node-exporter.run $PREFIX/var/service/node-exporter/run
 export SVDIR=$PREFIX/var/service; sv up node-exporter
-(crontab -l 2>/dev/null; echo '* * * * * $HOME/monitoring/repo/deploy/battery.sh') | crontab -
+(crontab -l 2>/dev/null; echo '* * * * * $HOME/monitoring/repo/deploy/textfile.sh') | crontab -
 curl -s localhost:9100/metrics | grep -E '^termux_' | head
 ```
 
 Collectors are an allowlist, not the defaults. Android denies apps
-`/proc/stat`, `/proc/loadavg`, `/proc/vmstat`, `/proc/net`, netlink and parts
-of `/sys`: no CPU, load or network metrics on a phone, ever. What works:
-meminfo, filesystem (`/data`), cpufreq, uname, time, textfile. Thermal comes
-from `battery.sh` (the built-in collector fails on the first denied zone).
+`/proc/stat`, `/proc/loadavg`, `/proc/vmstat`, `/proc/uptime`, `/proc/net`,
+netlink and parts of `/sys`. What works in node_exporter: meminfo, filesystem
+(`/data`), cpufreq, uname, time, textfile. `textfile.sh` fills the rest by
+side doors: load from the `sysinfo()` syscall (what bionic's `getloadavg`
+does), per-core idle time from `cpuidle` sysfs (`1 - rate()` = busy, same
+math as `/proc/stat`), thermal from the cpu zones (the built-in collector
+fails on the first denied zone), battery from `termux-battery-status`. No
+network metrics, ever.
 `/data` is the filesystem that matters; the exclude list hides Android's 30
 pseudo mounts.
 
