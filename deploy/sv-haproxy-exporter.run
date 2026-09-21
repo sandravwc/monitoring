@@ -1,0 +1,4 @@
+#!/data/data/com.termux/files/usr/bin/sh
+# termux haproxy is built without PROMEX (no built-in /metrics), so the classic exporter reads the stats socket.
+exec 2>&1
+exec $HOME/monitoring/bin/haproxy_exporter --haproxy.scrape-uri=unix:$HOME/haproxy.sock --web.listen-address=127.0.0.1:9101

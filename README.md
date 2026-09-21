@@ -12,7 +12,7 @@ dead-man's check from the workstation.
 │   │  scrape                                              │       │  ntfy if unreachable │
 │   ├─► node_exporter :9100  meminfo, /data, cpufreq       │       └──────────────────────┘
 │   │     textfile.sh: battery, load, cpu busy, thermal    │
-│   ├─► anubis metrics :9917 :9091                         │
+│   ├─► anubis metrics :9917 :9091, haproxy_exporter :9101 │
 │   └─► blackbox :9115 ─ http/tcp ─► haproxy :8443 ─► anubis ─► shoko / mealprep; nfs, sshd
 │ grafana :3000 ─► prometheus                              │
 │ haproxy :8443: prom. alerts. (basic auth)  grafana. (own login)
@@ -33,6 +33,7 @@ deploy/alerts.yml            rules: down, probe failed, cert < 14d, disk, therma
 deploy/alertmanager.yml      route everything to ntfy, drop Watchdog; topic url read from ~/monitoring/ntfy.url
 deploy/blackbox.yml          http_2xx (follows redirects), tcp_connect
 deploy/textfile.sh           cron */1: battery, load (sysinfo), cpu idle (cpuidle sysfs), thermal -> ~/monitoring/textfile/termux.prom
+deploy/sv-haproxy-exporter.run  haproxy_exporter on the stats socket (termux haproxy has no PROMEX)
 deploy/tinyproxy.conf        local forward proxy: DNS for the Go binaries (they can't resolve on Android)
 deploy/haproxy.cfg           backends prom, alerts, grafana; symlinked into ~/haproxy.d/
 deploy/grafana.ini           grafana on 127.0.0.1:3000, data in ~/monitoring/grafana, provisioning from the repo
@@ -75,10 +76,11 @@ pseudo mounts.
 
 ```sh
 pkg install tinyproxy
-for c in prometheus alertmanager blackbox_exporter; do ~/monitoring/repo/deploy/fetch.sh $c; done
+for c in prometheus alertmanager blackbox_exporter haproxy_exporter; do ~/monitoring/repo/deploy/fetch.sh $c; done
+# haproxy: `stats socket ~/haproxy.sock mode 600 level operator` in the global section (see shoko-termux/deploy/haproxy-base.cfg)
 echo 'https://ntfy.sh/<topic>?template=alertmanager' > ~/monitoring/ntfy.url; chmod 600 ~/monitoring/ntfy.url
-for s in tinyproxy prometheus alertmanager blackbox; do mkdir -p $PREFIX/var/service/$s; cp ~/monitoring/repo/deploy/sv-$s.run $PREFIX/var/service/$s/run; done
-sv up tinyproxy prometheus alertmanager blackbox
+for s in tinyproxy prometheus alertmanager blackbox haproxy-exporter; do mkdir -p $PREFIX/var/service/$s; cp ~/monitoring/repo/deploy/sv-$s.run $PREFIX/var/service/$s/run; done
+sv up tinyproxy prometheus alertmanager blackbox haproxy-exporter
 ~/monitoring/bin/prometheus --config.file ~/monitoring/repo/deploy/prometheus.yml --check-config   # promtool is in the tarball too
 ```
 
