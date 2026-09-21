@@ -34,7 +34,7 @@ deploy/alertmanager.yml      route everything to ntfy, drop Watchdog; topic url 
 deploy/blackbox.yml          http_2xx (follows redirects), tcp_connect
 deploy/textfile.sh           cron */1: battery, load (sysinfo), cpu idle (cpuidle sysfs), thermal -> ~/monitoring/textfile/termux.prom
 deploy/tinyproxy.conf        local forward proxy: DNS for the Go binaries (they can't resolve on Android)
-deploy/haproxy.cfg           backends prom/alerts (haproxy basic auth) and grafana, symlinked into ~/haproxy.d/
+deploy/haproxy.cfg           backends prom, alerts, grafana; symlinked into ~/haproxy.d/
 deploy/grafana.ini           grafana on 127.0.0.1:3000, data in ~/monitoring/grafana, provisioning from the repo
 deploy/grafana/              provisioned prometheus datasource + the "poco" dashboard
 deploy/sv-*.run              runit services
@@ -87,13 +87,16 @@ Subscribe to the topic in the ntfy app.
 ### Web UIs: prom., alerts., grafana.
 
 Everything binds 127.0.0.1; haproxy (`~/haproxy.d`, see shoko-termux) puts
-them on the wildcard cert. Prometheus and Alertmanager have no login, so
-haproxy asks for one (`userlist` in `haproxy.cfg`, hash made with
-`openssl passwd -6`). Grafana logs in itself.
+them on the wildcard cert. Prometheus and Alertmanager do their own basic
+auth (`--web.config.file`, bcrypt): `~/monitoring/web.yml`, made on any box
+with `htpasswd -nbB mrk '<pw>'`. Termux's haproxy lacks `crypt(3)`, so a
+haproxy `userlist` would have to be plaintext in this repo. Grafana logs in
+itself.
 
 ```sh
 pkg install grafana
 echo 'GF_SECURITY_ADMIN_PASSWORD=<pw>' > ~/monitoring/grafana.env; chmod 600 ~/monitoring/grafana.env
+printf 'basic_auth_users:\n  mrk: "<bcrypt hash>"\n' > ~/monitoring/web.yml; chmod 600 ~/monitoring/web.yml; sv restart prometheus alertmanager
 mkdir -p ~/monitoring/grafana $PREFIX/var/service/grafana
 cp ~/monitoring/repo/deploy/sv-grafana.run $PREFIX/var/service/grafana/run; sv up grafana
 ln -s ~/monitoring/repo/deploy/haproxy.cfg ~/haproxy.d/30-monitoring.cfg; haproxy -c -f ~/haproxy.d && sv restart haproxy
