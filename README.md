@@ -37,7 +37,7 @@ deploy/sv-haproxy-exporter.run  haproxy_exporter on the stats socket (termux hap
 deploy/tinyproxy.conf        local forward proxy: DNS for the Go binaries (they can't resolve on Android)
 deploy/haproxy.cfg           backends prom, alerts, grafana; symlinked into ~/haproxy.d/
 deploy/grafana.ini           grafana on 127.0.0.1:3000, data in ~/monitoring/grafana, provisioning from the repo
-deploy/grafana/              provisioned prometheus datasource + the "poco" dashboard
+deploy/grafana/              provisioned prometheus datasource; dashboards come from `sandravwc/grafana-dashboards` cloned to ~/monitoring/dashboards
 deploy/sv-*.run              runit services
 deploy/deadman.sh            workstation cron: ntfy when the Poco's Prometheus is unreachable
 ```
@@ -101,6 +101,7 @@ pkg install grafana
 echo 'GF_SECURITY_ADMIN_PASSWORD=<pw>' > ~/monitoring/grafana.env; chmod 600 ~/monitoring/grafana.env
 printf 'userlist monitoring\n    user mrk insecure-password <pw>\n' > ~/haproxy.d/05-auth.cfg; chmod 600 ~/haproxy.d/05-auth.cfg
 mkdir -p ~/monitoring/grafana $PREFIX/var/service/grafana
+git clone https://github.com/sandravwc/grafana-dashboards ~/monitoring/dashboards
 cp ~/monitoring/repo/deploy/sv-grafana.run $PREFIX/var/service/grafana/run; sv up grafana
 ln -s ~/monitoring/repo/deploy/haproxy.cfg ~/haproxy.d/30-monitoring.cfg; haproxy -c -f ~/haproxy.d && sv restart haproxy
 # dns: prom, alerts, grafana as CNAME -> poco
@@ -123,7 +124,7 @@ Test an alert without breaking anything:
 - Change a rule/target: edit in the workstation clone, push, `git pull` on the Nothing, `sv restart prometheus` (or `kill -HUP` for a config reload)
 - Logs: `$PREFIX/var/log/sv/<svc>/current`
 - Update a binary: `fetch.sh <name>`, `sv restart <svc>`; grafana via `pkg upgrade`
-- Dashboard edits in the Grafana UI are not saved to the repo (provisioned, read-only): export JSON → `deploy/grafana/dashboards/`, or edit the JSON
+- Dashboards: `sandravwc/grafana-dashboards`, provisioned read-only; edit JSON there, push, `git pull` in `~/monitoring/dashboards`
 - Dead monitor: `deadman.sh` from the workstation, systemd user timer (`deploy/monitoring-deadman.{service,timer}` → `~/.config/systemd/user/`, `systemctl --user enable --now monitoring-deadman.timer`), topic url in `~/.config/monitoring-ntfy.url`. Only fires while the workstation is awake; the `Watchdog` alert (always firing, blackholed) shows in `/alerts` that rules evaluate
 - Data: 90 d retention, ~1 GB/yr at this size
 
