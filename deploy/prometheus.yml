@@ -1,0 +1,45 @@
+global:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+
+rule_files: [alerts.yml]
+
+alerting:
+  alertmanagers:
+    - static_configs: [{ targets: ['127.0.0.1:9093'] }]
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs: [{ targets: ['127.0.0.1:9090'] }]
+
+  - job_name: node
+    static_configs:
+      - targets: ['192.168.1.100:9100']
+        labels: { host: nothing }
+      - targets: ['192.168.1.106:9100']
+        labels: { host: poco }
+
+  # blackbox: the monitor probes the services from outside the box they run on
+  - job_name: http
+    metrics_path: /probe
+    params: { module: [http_2xx] }
+    static_configs:
+      - targets:
+          - https://poco.xn--bdk.dog:8443/           # mealprep via haproxy+anubis, public
+          - https://shoko.poco.xn--bdk.dog:8443/     # shoko via haproxy+anubis, public
+          - http://192.168.1.106:8111/api/v3/Init/Status   # shoko api, lan
+          - http://192.168.1.106:8090/                # mealprep app, lan
+    relabel_configs: &bb
+      - { source_labels: [__address__], target_label: __param_target }
+      - { source_labels: [__param_target], target_label: instance }
+      - { target_label: __address__, replacement: 127.0.0.1:9115 }
+
+  - job_name: tcp
+    metrics_path: /probe
+    params: { module: [tcp_connect] }
+    static_configs:
+      - targets:
+          - 192.168.1.106:8022    # poco sshd
+          - 192.168.1.106:2049    # poco nfs export
+          - 192.168.1.106:8384    # poco syncthing
+    relabel_configs: *bb

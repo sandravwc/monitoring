@@ -1,0 +1,17 @@
+# ntfy formats the payload itself (?template=alertmanager in the url). Topic is a secret: url lives in ~/monitoring/ntfy.url, not here.
+route:
+  receiver: ntfy
+  group_by: [alertname, host, instance]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 12h
+  routes:
+    - matchers: [alertname = Watchdog]
+      receiver: blackhole
+
+receivers:
+  - name: ntfy
+    webhook_configs:
+      - url_file: /data/data/com.termux/files/home/monitoring/ntfy.url
+        send_resolved: true
+  - name: blackhole

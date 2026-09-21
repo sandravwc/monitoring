@@ -1,0 +1,7 @@
+#!/data/data/com.termux/files/usr/bin/sh
+# on every phone. net* collectors need netlink / /proc/net, denied to apps on Android -> off
+exec 2>&1
+exec $HOME/monitoring/bin/node_exporter --web.listen-address=:9100 \
+  --no-collector.netdev --no-collector.netstat --no-collector.netclass --no-collector.arp --no-collector.sockstat --no-collector.conntrack --no-collector.softnet --no-collector.udp_queues \
+  --collector.textfile.directory=$HOME/monitoring/textfile \
+  --collector.filesystem.mount-points-exclude='^/(apex|system|vendor|product|odm|mnt|storage|data_mirror|sys|proc|dev|linkerconfig|debug_ramdisk|metadata|cache|config|efs|optics|prism|omr|firmware)($|/)'

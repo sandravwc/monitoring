@@ -1,0 +1,67 @@
+groups:
+  - name: fleet
+    rules:
+      - alert: Watchdog
+        expr: vector(1)
+        labels: { severity: none }
+        annotations: { summary: "monitor alive (dead man's switch, always firing)" }
+
+      - alert: TargetDown
+        expr: up == 0
+        for: 3m
+        labels: { severity: critical }
+        annotations: { summary: "{{ $labels.job }} {{ $labels.instance }} not scrapable" }
+
+      - alert: ProbeFailed
+        expr: probe_success == 0
+        for: 3m
+        labels: { severity: critical }
+        annotations: { summary: "{{ $labels.instance }} probe failed" }
+
+      - alert: CertExpiresSoon
+        expr: (probe_ssl_earliest_cert_expiry - time()) / 86400 < 14
+        for: 1h
+        labels: { severity: warning }
+        annotations: { summary: "{{ $labels.instance }} cert expires in {{ $value | printf \"%.0f\" }} days" }
+
+      - alert: DiskAlmostFull
+        expr: node_filesystem_avail_bytes{mountpoint="/data"} / node_filesystem_size_bytes < 0.10
+        for: 10m
+        labels: { severity: warning }
+        annotations: { summary: "{{ $labels.host }} /data below 10% free" }
+
+      - alert: HotPhone
+        expr: max by (host) (node_thermal_zone_temp) > 75
+        for: 10m
+        labels: { severity: warning }
+        annotations: { summary: "{{ $labels.host }} {{ $value }}°C for 10m" }
+
+      - alert: SwapHeavy
+        expr: (1 - node_memory_SwapFree_bytes / node_memory_SwapTotal_bytes) > 0.8
+        for: 15m
+        labels: { severity: warning }
+        annotations: { summary: "{{ $labels.host }} swap > 80% (OS kill risk)" }
+
+      - alert: BatteryDraining
+        expr: termux_battery_plugged == 1 and termux_battery_current_amps > 0
+        for: 10m
+        labels: { severity: critical }
+        annotations: { summary: "{{ $labels.host }} plugged in but draining {{ $value }} A (cable/port/handshake)" }
+
+      - alert: BatteryUnplugged
+        expr: termux_battery_plugged == 0
+        for: 5m
+        labels: { severity: critical }
+        annotations: { summary: "{{ $labels.host }} on battery" }
+
+      - alert: BatteryLow
+        expr: termux_battery_percent < 20
+        for: 5m
+        labels: { severity: critical }
+        annotations: { summary: "{{ $labels.host }} battery {{ $value }}%" }
+
+      - alert: BatteryStale
+        expr: time() - node_textfile_mtime_seconds{file="battery.prom"} > 300
+        for: 5m
+        labels: { severity: warning }
+        annotations: { summary: "{{ $labels.host }} battery.prom not updated (crond?)" }

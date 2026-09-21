@@ -1,0 +1,4 @@
+#!/data/data/com.termux/files/usr/bin/sh
+exec 2>&1
+cd $HOME/monitoring/repo/deploy
+exec $HOME/monitoring/bin/prometheus --config.file=prometheus.yml --storage.tsdb.path=$HOME/monitoring/data --storage.tsdb.retention.time=90d --web.listen-address=127.0.0.1:9090
