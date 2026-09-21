@@ -87,16 +87,17 @@ Subscribe to the topic in the ntfy app.
 ### Web UIs: prom., alerts., grafana.
 
 Everything binds 127.0.0.1; haproxy (`~/haproxy.d`, see shoko-termux) puts
-them on the wildcard cert. Prometheus and Alertmanager do their own basic
-auth (`--web.config.file`, bcrypt): `~/monitoring/web.yml`, made on any box
-with `htpasswd -nbB mrk '<pw>'`. Termux's haproxy lacks `crypt(3)`, so a
-haproxy `userlist` would have to be plaintext in this repo. Grafana logs in
-itself.
+them on the wildcard cert. Prometheus and Alertmanager have no login and
+every loopback client (Prometheus → Alertmanager, Grafana → Prometheus,
+self-scrape) would need the password if they had one, so haproxy asks at the
+edge instead. Termux's haproxy lacks `crypt(3)`: the userlist is plaintext,
+so it lives outside the repo in `~/haproxy.d/05-auth.cfg`, 0600. Grafana logs
+in itself.
 
 ```sh
 pkg install grafana
 echo 'GF_SECURITY_ADMIN_PASSWORD=<pw>' > ~/monitoring/grafana.env; chmod 600 ~/monitoring/grafana.env
-printf 'basic_auth_users:\n  mrk: "<bcrypt hash>"\n' > ~/monitoring/web.yml; chmod 600 ~/monitoring/web.yml; sv restart prometheus alertmanager
+printf 'userlist monitoring\n    user mrk insecure-password <pw>\n' > ~/haproxy.d/05-auth.cfg; chmod 600 ~/haproxy.d/05-auth.cfg
 mkdir -p ~/monitoring/grafana $PREFIX/var/service/grafana
 cp ~/monitoring/repo/deploy/sv-grafana.run $PREFIX/var/service/grafana/run; sv up grafana
 ln -s ~/monitoring/repo/deploy/haproxy.cfg ~/haproxy.d/30-monitoring.cfg; haproxy -c -f ~/haproxy.d && sv restart haproxy
