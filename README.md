@@ -1,19 +1,22 @@
 # monitoring
 
-Prometheus + Alertmanager for the phone fleet, running on a phone. Nagios
-shape (checks, thresholds, pushes) with Go static binaries that run rootless
-in Termux. Monitor host is the Nothing Phone 2: separate box from what it
-watches, own battery, always on. Alerts go to ntfy (account-free, ntfy
-formats Alertmanager's JSON itself, no bridge).
+Prometheus + Alertmanager on the Poco, watching the Poco. Nagios shape
+(checks, thresholds, pushes) with Go static binaries that run rootless in
+Termux. Yes, the monitor sits on the box it monitors: the other phones are
+daily drivers, the workstation sleeps. The one thing that setup cannot see, a
+dead Poco, is covered by a cron on the workstation (`deadman.sh`). Alerts go
+to ntfy (account-free, ntfy formats Alertmanager's JSON itself, no bridge).
 
 ```txt
- nothing phone 2 (monitor)                          poco f5 pro (services)
-┌──────────────────────────────────────────┐        ┌──────────────────────────┐
-│ prometheus :9090 ──► alertmanager :9093 ─┼─► ntfy │ node_exporter :9100      │
-│   │  scrape                              │        │   textfile: battery.prom │
-│   ├──► node_exporter :9100 (itself)      │        │ shoko :8111  mealprep    │
-│   └──► blackbox :9115 ── http/tcp ───────┼───────►│ haproxy :8443  nfs :2049 │
-└──────────────────────────────────────────┘        └──────────────────────────┘
+ poco f5 pro                                                       workstation
+┌────────────────────────────────────────────────────────┐        ┌─────────────────────┐
+│ prometheus :9090 ──► alertmanager :9093 ──► ntfy.sh    │ ◄──ssh─┤ cron */30 deadman.sh│
+│   │  scrape                                            │        │  ntfy if unreachable│
+│   ├──► node_exporter :9100  (meminfo, /data, cpufreq,  │        └─────────────────────┘
+│   │       textfile: battery + cpu thermal, cron */1)   │
+│   └──► blackbox :9115 ── http/tcp ──► haproxy :8443 ──► anubis ──► shoko :8111 / mealprep :8090
+│                                       nfs :2049, sshd :8022, syncthing :8384
+└────────────────────────────────────────────────────────┘
 ```
 
 Nagios → here: NRPE = `node_exporter` on each host; check_http/tcp/ssl =
@@ -31,14 +34,15 @@ deploy/alertmanager.yml      route everything to ntfy, drop Watchdog; topic url 
 deploy/blackbox.yml          http_2xx (follows redirects), tcp_connect
 deploy/battery.sh            cron */1: termux-battery-status -> ~/monitoring/textfile/battery.prom
 deploy/sv-*.run              runit services
+deploy/deadman.sh            workstation cron: ntfy when the Poco's Prometheus is unreachable
 ```
 
-On a phone, outside the repo: `~/monitoring/{bin,data,alertmanager,textfile}`,
+On the Poco, outside the repo: `~/monitoring/{bin,data,alertmanager,textfile}`,
 `~/monitoring/ntfy.url` (secret, `https://ntfy.sh/<topic>?template=alertmanager`).
 
 ## Install
 
-### Every phone (node_exporter + battery)
+### Poco: node_exporter + battery
 
 ```sh
 pkg install termux-services termux-api python    # termux-api needs the Termux:API app too
@@ -59,7 +63,7 @@ from `battery.sh` (the built-in collector fails on the first denied zone).
 `/data` is the filesystem that matters; the exclude list hides Android's 30
 pseudo mounts.
 
-### Monitor (Nothing)
+### Poco: Prometheus, Alertmanager, blackbox
 
 ```sh
 for c in prometheus alertmanager blackbox_exporter; do ~/monitoring/repo/deploy/fetch.sh $c; done
@@ -69,8 +73,8 @@ sv up prometheus alertmanager blackbox
 ~/monitoring/bin/prometheus --config.file ~/monitoring/repo/deploy/prometheus.yml --check-config   # promtool is in the tarball too
 ```
 
-Subscribe to the topic in the ntfy app. UIs (LAN only via ssh tunnel, they
-bind 127.0.0.1): `ssh -L 9090:127.0.0.1:9090 nothing` → http://localhost:9090
+Subscribe to the topic in the ntfy app. UIs (ssh tunnel, everything binds
+127.0.0.1): `ssh -L 9090:127.0.0.1:9090 poco` → http://localhost:9090
 (`/alerts`, `/targets`), 9093 for Alertmanager.
 
 Test an alert without breaking anything:
@@ -84,7 +88,7 @@ Test an alert without breaking anything:
 - Change a rule/target: edit in the workstation clone, push, `git pull` on the Nothing, `sv restart prometheus` (or `kill -HUP` for a config reload)
 - Logs: `$PREFIX/var/log/sv/<svc>/current`
 - Update a binary: `fetch.sh <name>`, `sv restart <svc>`
-- Dead monitor: the `Watchdog` alert fires forever by design and is routed to a blackhole; if it ever stops arriving at Alertmanager (`/alerts` in the UI), Prometheus is down. Nothing external checks the monitor yet (todo: workstation cron)
+- Dead monitor: `deadman.sh` from the workstation cron, `*/30 * * * * ~/workdir/git/monitoring/deploy/deadman.sh`, topic url in `~/.config/monitoring-ntfy.url`. Only fires while the workstation is awake; the `Watchdog` alert (always firing, blackholed) shows in `/alerts` that rules evaluate
 - Data: 90 d retention, ~1 GB/yr at this size
 
 ## Gotchas
@@ -92,4 +96,4 @@ Test an alert without breaking anything:
 - node_exporter ≥ 1.9 calls `open_tree()` (filepath-securejoin), Android seccomp answers SIGSYS, process dies on first scrape. 1.8.2 pinned
 - `/sys/class/thermal`: cpu zones readable, others not; `hwmon`, `pressure` denied
 - `termux-battery-status` current sign: negative = charging on Xiaomi kernels; `BatteryDraining` alert relies on it
-- HyperOS kills Termux when idle: `termux-wake-lock` + battery optimization off for Termux on every phone, or the monitor itself vanishes
+- HyperOS kills Termux when idle: `termux-wake-lock` + battery optimization off for Termux, or the monitor vanishes with everything else (that is what `deadman.sh` is for)
