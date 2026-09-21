@@ -1,7 +1,8 @@
 #!/data/data/com.termux/files/usr/bin/sh
-# on every phone. net* collectors need netlink / /proc/net, denied to apps on Android -> off
+# on every phone. node_exporter pinned 1.8.2: >=1.9 calls open_tree(), Android seccomp -> SIGSYS.
+# allowlist instead of defaults: Android denies /proc/stat, /proc/loadavg, /proc/vmstat, netlink, /proc/net to apps -> no cpu/load/net.
 exec 2>&1
-exec $HOME/monitoring/bin/node_exporter --web.listen-address=:9100 \
-  --no-collector.netdev --no-collector.netstat --no-collector.netclass --no-collector.arp --no-collector.sockstat --no-collector.conntrack --no-collector.softnet --no-collector.udp_queues \
-  --collector.textfile.directory=$HOME/monitoring/textfile \
-  --collector.filesystem.mount-points-exclude='^/(apex|system|vendor|product|odm|mnt|storage|data_mirror|sys|proc|dev|linkerconfig|debug_ramdisk|metadata|cache|config|efs|optics|prism|omr|firmware)($|/)'
+exec $HOME/monitoring/bin/node_exporter --web.listen-address=:9100 --collector.disable-defaults \
+  --collector.meminfo --collector.filesystem --collector.cpufreq --collector.uname --collector.time --collector.entropy \
+  --collector.textfile --collector.textfile.directory=$HOME/monitoring/textfile \
+  --collector.filesystem.mount-points-exclude='^/(apex|system|system_ext|vendor|vendor_dlkm|product|odm|odm_dlkm|cust|rescue|mnt|storage|data_mirror|sys|proc|dev|linkerconfig|debug_ramdisk|metadata|cache|config|efs|optics|prism|omr|firmware|dsp|bt_firmware|persist|mi_ext)($|/)'

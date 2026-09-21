@@ -31,7 +31,7 @@ groups:
         annotations: { summary: "{{ $labels.host }} /data below 10% free" }
 
       - alert: HotPhone
-        expr: max by (host) (node_thermal_zone_temp) > 75
+        expr: max by (host) (termux_cpu_temperature_celsius) > 75
         for: 10m
         labels: { severity: warning }
         annotations: { summary: "{{ $labels.host }} {{ $value }}°C for 10m" }

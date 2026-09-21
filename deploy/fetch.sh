@@ -1,6 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/sh
 # Download upstream linux-arm64 static builds into ~/monitoring/bin. No Termux packages for these.
-# usage: fetch.sh prometheus|alertmanager|node_exporter|blackbox_exporter [version]
+# usage: fetch.sh prometheus|alertmanager|node_exporter|blackbox_exporter [version]   (node_exporter: pass 1.8.2, see sv-node-exporter.run)
 set -e
 name=$1; ver=${2:-$(curl -s https://api.github.com/repos/prometheus/$name/releases/latest | grep -m1 '"tag_name"' | cut -d'"' -f4 | tr -d v)}
 dir=$name-$ver.linux-arm64

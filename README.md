@@ -43,17 +43,21 @@ On a phone, outside the repo: `~/monitoring/{bin,data,alertmanager,textfile}`,
 ```sh
 pkg install termux-services termux-api python    # termux-api needs the Termux:API app too
 git clone https://github.com/sandravwc/monitoring ~/monitoring/repo
-~/monitoring/repo/deploy/fetch.sh node_exporter
+~/monitoring/repo/deploy/fetch.sh node_exporter 1.8.2     # pinned, newer ones die with SIGSYS on Android
 mkdir -p ~/monitoring/textfile $PREFIX/var/service/node-exporter
 cp ~/monitoring/repo/deploy/sv-node-exporter.run $PREFIX/var/service/node-exporter/run
 export SVDIR=$PREFIX/var/service; sv up node-exporter
 (crontab -l 2>/dev/null; echo '* * * * * $HOME/monitoring/repo/deploy/battery.sh') | crontab -
-curl -s localhost:9100/metrics | grep -E '^termux_battery|^node_thermal' | head
+curl -s localhost:9100/metrics | grep -E '^termux_' | head
 ```
 
-Net collectors are off: Android denies netlink and `/proc/net` to apps, they
-would only log errors. `/data` is the filesystem that matters; the exclude
-list hides Android's 30 pseudo mounts.
+Collectors are an allowlist, not the defaults. Android denies apps
+`/proc/stat`, `/proc/loadavg`, `/proc/vmstat`, `/proc/net`, netlink and parts
+of `/sys`: no CPU, load or network metrics on a phone, ever. What works:
+meminfo, filesystem (`/data`), cpufreq, uname, time, textfile. Thermal comes
+from `battery.sh` (the built-in collector fails on the first denied zone).
+`/data` is the filesystem that matters; the exclude list hides Android's 30
+pseudo mounts.
 
 ### Monitor (Nothing)
 
@@ -85,6 +89,7 @@ Test an alert without breaking anything:
 
 ## Gotchas
 
-- `node_thermal_zone_temp` works (`/sys/class/thermal` readable), `hwmon` mostly not
+- node_exporter ≥ 1.9 calls `open_tree()` (filepath-securejoin), Android seccomp answers SIGSYS, process dies on first scrape. 1.8.2 pinned
+- `/sys/class/thermal`: cpu zones readable, others not; `hwmon`, `pressure` denied
 - `termux-battery-status` current sign: negative = charging on Xiaomi kernels; `BatteryDraining` alert relies on it
 - HyperOS kills Termux when idle: `termux-wake-lock` + battery optimization off for Termux on every phone, or the monitor itself vanishes
