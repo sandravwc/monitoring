@@ -1,0 +1,5 @@
+[Unit]
+Description=ntfy when the Poco's Prometheus is unreachable
+[Service]
+Type=oneshot
+ExecStart=%h/workdir/git/monitoring/deploy/deadman.sh

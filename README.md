@@ -88,7 +88,7 @@ Test an alert without breaking anything:
 - Change a rule/target: edit in the workstation clone, push, `git pull` on the Nothing, `sv restart prometheus` (or `kill -HUP` for a config reload)
 - Logs: `$PREFIX/var/log/sv/<svc>/current`
 - Update a binary: `fetch.sh <name>`, `sv restart <svc>`
-- Dead monitor: `deadman.sh` from the workstation cron, `*/30 * * * * ~/workdir/git/monitoring/deploy/deadman.sh`, topic url in `~/.config/monitoring-ntfy.url`. Only fires while the workstation is awake; the `Watchdog` alert (always firing, blackholed) shows in `/alerts` that rules evaluate
+- Dead monitor: `deadman.sh` from the workstation, systemd user timer (`deploy/monitoring-deadman.{service,timer}` → `~/.config/systemd/user/`, `systemctl --user enable --now monitoring-deadman.timer`), topic url in `~/.config/monitoring-ntfy.url`. Only fires while the workstation is awake; the `Watchdog` alert (always firing, blackholed) shows in `/alerts` that rules evaluate
 - Data: 90 d retention, ~1 GB/yr at this size
 
 ## Gotchas
