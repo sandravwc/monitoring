@@ -5,6 +5,24 @@ modules:
     http:
       follow_redirects: true
       preferred_ip_protocol: ip4
+  # pure-Go resolver finds no /etc/resolv.conf on Android -> public names can't resolve inside blackbox.
+  # probe the LAN ip with the name pinned in SNI + Host: still checks cert, haproxy routing, anubis. Not: dns, nat loopback.
+  https_shoko:
+    prober: http
+    timeout: 10s
+    http:
+      follow_redirects: true
+      preferred_ip_protocol: ip4
+      headers: { Host: shoko.poco.xn--bdk.dog }
+      tls_config: { server_name: shoko.poco.xn--bdk.dog }
+  https_mealprep:
+    prober: http
+    timeout: 10s
+    http:
+      follow_redirects: true
+      preferred_ip_protocol: ip4
+      headers: { Host: poco.xn--bdk.dog }
+      tls_config: { server_name: poco.xn--bdk.dog }
   tcp_connect:
     prober: tcp
     timeout: 5s

@@ -30,14 +30,24 @@ scrape_configs:
     params: { module: [http_2xx] }
     static_configs:
       - targets:
-          - https://poco.xn--bdk.dog:8443/           # mealprep via haproxy+anubis, public
-          - https://shoko.poco.xn--bdk.dog:8443/     # shoko via haproxy+anubis, public
           - http://192.168.1.106:8111/api/v3/Init/Status   # shoko api, lan
           - http://192.168.1.106:8090/                # mealprep app, lan
     relabel_configs: &bb
       - { source_labels: [__address__], target_label: __param_target }
       - { source_labels: [__param_target], target_label: instance }
       - { target_label: __address__, replacement: 127.0.0.1:9115 }
+
+  # public sites through haproxy + anubis; name via SNI/Host, see blackbox.yml
+  - job_name: https_shoko
+    metrics_path: /probe
+    params: { module: [https_shoko] }
+    static_configs: [{ targets: ['https://192.168.1.106:8443/'], labels: { site: shoko.poco.xn--bdk.dog } }]
+    relabel_configs: *bb
+  - job_name: https_mealprep
+    metrics_path: /probe
+    params: { module: [https_mealprep] }
+    static_configs: [{ targets: ['https://192.168.1.106:8443/'], labels: { site: poco.xn--bdk.dog } }]
+    relabel_configs: *bb
 
   - job_name: tcp
     metrics_path: /probe
@@ -46,5 +56,4 @@ scrape_configs:
       - targets:
           - 192.168.1.106:8022    # poco sshd
           - 192.168.1.106:2049    # poco nfs export
-          - 192.168.1.106:8384    # poco syncthing
     relabel_configs: *bb

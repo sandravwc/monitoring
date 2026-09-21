@@ -95,5 +95,7 @@ Test an alert without breaking anything:
 
 - node_exporter ≥ 1.9 calls `open_tree()` (filepath-securejoin), Android seccomp answers SIGSYS, process dies on first scrape. 1.8.2 pinned
 - `/sys/class/thermal`: cpu zones readable, others not; `hwmon`, `pressure` denied
+- Go's pure resolver reads `/etc/resolv.conf`, Android has none: blackbox can't resolve names. Public sites are probed by LAN ip with SNI + `Host` pinned (`https_*` modules). DNS and NAT loopback stay unchecked from the phone
+- Alertmanager: `--cluster.listen-address=""`, gossip setup needs netlink
 - `termux-battery-status` current sign: negative = charging on Xiaomi kernels; `BatteryDraining` alert relies on it
 - HyperOS kills Termux when idle: `termux-wake-lock` + battery optimization off for Termux, or the monitor vanishes with everything else (that is what `deadman.sh` is for)
