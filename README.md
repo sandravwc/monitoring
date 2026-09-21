@@ -32,7 +32,7 @@ deploy/prometheus.yml        scrape targets: node on both phones, blackbox http/
 deploy/alerts.yml            rules: down, probe failed, cert < 14d, disk, thermal, swap, load, cpu, battery
 deploy/alertmanager.yml      route everything to ntfy, drop Watchdog; topic url read from ~/monitoring/ntfy.url
 deploy/blackbox.yml          http_2xx (follows redirects), tcp_connect
-deploy/textfile.sh           cron */1: battery, load (sysinfo), cpu idle (cpuidle sysfs), thermal -> ~/monitoring/textfile/termux.prom
+deploy/textfile.sh           cron */1: battery, load (sysinfo), cpu idle (cpuidle sysfs), thermal, fuse latency on the ssd -> ~/monitoring/textfile/termux.prom
 deploy/sv-haproxy-exporter.run  haproxy_exporter on the stats socket (termux haproxy has no PROMEX)
 deploy/tinyproxy.conf        local forward proxy: DNS for the Go binaries (they can't resolve on Android)
 deploy/haproxy.cfg           backends prom, alerts, grafana; symlinked into ~/haproxy.d/
@@ -131,7 +131,7 @@ Test an alert without breaking anything:
 ## Gotchas
 
 - node_exporter ≥ 1.9 calls `open_tree()` (filepath-securejoin), Android seccomp answers SIGSYS, process dies on first scrape. 1.8.2 pinned
-- `/sys/class/thermal`: cpu zones readable, others not; `hwmon`, `pressure` denied
+- `/sys/class/thermal`: cpu zones readable, others not; `hwmon`, `pressure`, `/sys/fs/fuse/connections` denied. FUSE queue depth is not readable, so `textfile.sh` times a listdir and a 1 MiB read on the SSD instead
 - Go's pure resolver reads `/etc/resolv.conf`, Android has none, and port 53 can't be bound for a local forwarder: no Go binary here can resolve a hostname. Fix: `tinyproxy` (bionic, resolves fine) on 127.0.0.1:8118, `proxy_url` in Alertmanager's webhook and blackbox's `http_public` module. Scrape targets stay IPs
 - Go finds no CA bundle either (`/etc/ssl`): `SSL_CERT_FILE=$PREFIX/etc/tls/cert.pem` in every run script
 - Alertmanager: `--cluster.listen-address=""`, gossip setup needs netlink

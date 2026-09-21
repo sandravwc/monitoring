@@ -77,3 +77,9 @@ groups:
         for: 30m
         labels: { severity: warning }
         annotations: { summary: "{{ $labels.host }} cpu > 90% for 30m" }
+
+      - alert: FuseSlow
+        expr: termux_fuse_listdir_seconds > 2 or termux_fuse_read1m_seconds > 5
+        for: 10m
+        labels: { severity: warning }
+        annotations: { summary: "{{ $labels.host }} usb ssd fuse slow for 10m (shoko hashing? nfs clients will time out)" }

@@ -4,8 +4,9 @@
 # current: negative = into the battery on Xiaomi kernels.
 out=$HOME/monitoring/textfile/termux.prom
 {
-termux-battery-status | python3 -c '
+termux-battery-status | SSD=/storage/EABF-DEDA python3 -c '
 import json, sys, ctypes, glob, os
+SSD = os.environ["SSD"]
 b = json.load(sys.stdin)
 print("termux_battery_percent", b["percentage"])
 print("termux_battery_current_amps", b["current"] / 1e6)
@@ -39,6 +40,18 @@ for cpu in sorted(glob.glob("/sys/devices/system/cpu/cpu[0-9]*/cpuidle")):
         busy = max(0.0, min(1.0, 1 - (idle - prev[n]) / (now - prev["t"])))
         print("termux_cpu_busy_ratio{cpu=\"%s\"} %.3f" % (n, busy))
 cur["t"] = now; j.dump(cur, open(state, "w"))
+
+# android fuse latency on the usb ssd (fusectl is denied to apps, so measure what clients feel)
+import signal
+def alarm(*_): raise TimeoutError
+signal.signal(signal.SIGALRM, alarm)
+for op, fn in (("listdir", lambda: os.listdir(SSD)), ("read1m", lambda: open(next(f for f in (os.path.join(dp, x) for dp, _, fs in os.walk(SSD) for x in fs) if os.path.getsize(f) > 1 << 20), "rb").read(1 << 20))):
+    signal.alarm(20); t = time.monotonic()
+    try: fn(); v = time.monotonic() - t
+    except TimeoutError: v = 20
+    except Exception: v = -1
+    signal.alarm(0)
+    print("termux_fuse_%s_seconds" % op, round(v, 4))
 '
 for z in /sys/class/thermal/thermal_zone*; do
     t=$(cat $z/type 2>/dev/null) || continue
