@@ -221,7 +221,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 13,
+    "y": 12,
     "w": 24,
     "h": 1
    },
@@ -233,7 +233,7 @@
    "title": "requests / min per backend",
    "gridPos": {
     "x": 0,
-    "y": 14,
+    "y": 13,
     "w": 12,
     "h": 7
    },
@@ -264,7 +264,7 @@
    "title": "responses / min by status",
    "gridPos": {
     "x": 12,
-    "y": 14,
+    "y": 13,
     "w": 12,
     "h": 7
    },
@@ -295,7 +295,7 @@
    "title": "requests today",
    "gridPos": {
     "x": 0,
-    "y": 21,
+    "y": 20,
     "w": 8,
     "h": 5
    },
@@ -349,7 +349,7 @@
    "title": "requests this week",
    "gridPos": {
     "x": 8,
-    "y": 21,
+    "y": 20,
     "w": 8,
     "h": 5
    },
@@ -403,7 +403,7 @@
    "title": "response bytes / min",
    "gridPos": {
     "x": 16,
-    "y": 21,
+    "y": 20,
     "w": 8,
     "h": 5
    },
@@ -429,85 +429,26 @@
    "options": {}
   },
   {
-   "id": 12,
-   "type": "stat",
+   "id": 32,
+   "type": "row",
    "title": "shoko",
+   "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 27,
-    "w": 8,
-    "h": 5
+    "y": 25,
+    "w": 24,
+    "h": 1
    },
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prom"
-   },
-   "targets": [
-    {
-     "refId": "A",
-     "expr": "probe_success{name=~\"shoko.*\"}",
-     "legendFormat": "{{name}}",
-     "instant": true,
-     "range": false
-    }
-   ],
-   "fieldConfig": {
-    "defaults": {
-     "thresholds": {
-      "mode": "absolute",
-      "steps": [
-       {
-        "color": "red",
-        "value": null
-       },
-       {
-        "color": "green",
-        "value": 1
-       }
-      ]
-     },
-     "mappings": [
-      {
-       "type": "value",
-       "options": {
-        "0": {
-         "text": "DOWN",
-         "color": "red"
-        },
-        "1": {
-         "text": "UP",
-         "color": "green"
-        }
-       }
-      }
-     ]
-    },
-    "overrides": []
-   },
-   "options": {
-    "reduceOptions": {
-     "calcs": [
-      "lastNotNull"
-     ]
-    },
-    "colorMode": "background",
-    "graphMode": "none",
-    "textMode": "value_and_name",
-    "text": {
-     "titleSize": 18,
-     "valueSize": 34
-    },
-    "justifyMode": "center"
-   }
+   "panels": []
   },
   {
    "id": 13,
    "type": "timeseries",
    "title": "anubis-shoko: proxied / challenged per min",
    "gridPos": {
-    "x": 8,
-    "y": 27,
-    "w": 8,
+    "x": 0,
+    "y": 26,
+    "w": 12,
     "h": 5
    },
    "datasource": {
@@ -543,9 +484,9 @@
    "type": "timeseries",
    "title": "shoko backend: requests / min",
    "gridPos": {
-    "x": 16,
-    "y": 27,
-    "w": 8,
+    "x": 12,
+    "y": 26,
+    "w": 12,
     "h": 5
    },
    "datasource": {
@@ -577,85 +518,26 @@
    "options": {}
   },
   {
-   "id": 16,
-   "type": "stat",
+   "id": 33,
+   "type": "row",
    "title": "mealprep",
+   "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 33,
-    "w": 8,
-    "h": 5
+    "y": 31,
+    "w": 24,
+    "h": 1
    },
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prom"
-   },
-   "targets": [
-    {
-     "refId": "A",
-     "expr": "probe_success{name=~\"mealprep.*\"}",
-     "legendFormat": "{{name}}",
-     "instant": true,
-     "range": false
-    }
-   ],
-   "fieldConfig": {
-    "defaults": {
-     "thresholds": {
-      "mode": "absolute",
-      "steps": [
-       {
-        "color": "red",
-        "value": null
-       },
-       {
-        "color": "green",
-        "value": 1
-       }
-      ]
-     },
-     "mappings": [
-      {
-       "type": "value",
-       "options": {
-        "0": {
-         "text": "DOWN",
-         "color": "red"
-        },
-        "1": {
-         "text": "UP",
-         "color": "green"
-        }
-       }
-      }
-     ]
-    },
-    "overrides": []
-   },
-   "options": {
-    "reduceOptions": {
-     "calcs": [
-      "lastNotNull"
-     ]
-    },
-    "colorMode": "background",
-    "graphMode": "none",
-    "textMode": "value_and_name",
-    "text": {
-     "titleSize": 18,
-     "valueSize": 34
-    },
-    "justifyMode": "center"
-   }
+   "panels": []
   },
   {
    "id": 17,
    "type": "timeseries",
    "title": "anubis-mealprep: proxied / challenged per min",
    "gridPos": {
-    "x": 8,
-    "y": 33,
-    "w": 8,
+    "x": 0,
+    "y": 32,
+    "w": 12,
     "h": 5
    },
    "datasource": {
@@ -691,9 +573,9 @@
    "type": "timeseries",
    "title": "mealprep backend: requests / min",
    "gridPos": {
-    "x": 16,
-    "y": 33,
-    "w": 8,
+    "x": 12,
+    "y": 32,
+    "w": 12,
     "h": 5
    },
    "datasource": {
@@ -731,7 +613,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 38,
+    "y": 37,
     "w": 24,
     "h": 1
    },
@@ -743,7 +625,7 @@
    "title": "cpu busy per core",
    "gridPos": {
     "x": 0,
-    "y": 39,
+    "y": 38,
     "w": 8,
     "h": 7
    },
@@ -776,7 +658,7 @@
    "title": "load",
    "gridPos": {
     "x": 8,
-    "y": 39,
+    "y": 38,
     "w": 8,
     "h": 7
    },
@@ -819,7 +701,7 @@
    "title": "memory",
    "gridPos": {
     "x": 16,
-    "y": 39,
+    "y": 38,
     "w": 8,
     "h": 7
    },
@@ -858,7 +740,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 46,
+    "y": 45,
     "w": 24,
     "h": 1
    },
@@ -870,7 +752,7 @@
    "title": "battery",
    "gridPos": {
     "x": 0,
-    "y": 47,
+    "y": 46,
     "w": 8,
     "h": 6
    },
@@ -903,7 +785,7 @@
    "title": "battery current (neg = charging)",
    "gridPos": {
     "x": 8,
-    "y": 47,
+    "y": 46,
     "w": 8,
     "h": 6
    },
@@ -934,7 +816,7 @@
    "title": "temperature",
    "gridPos": {
     "x": 16,
-    "y": 47,
+    "y": 46,
     "w": 8,
     "h": 6
    },
@@ -973,7 +855,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 53,
+    "y": 52,
     "w": 24,
     "h": 1
    },
@@ -985,7 +867,7 @@
    "title": "/data (termux, shoko db, models)",
    "gridPos": {
     "x": 0,
-    "y": 54,
+    "y": 53,
     "w": 16,
     "h": 6
    },
@@ -1015,7 +897,7 @@
    "title": "free",
    "gridPos": {
     "x": 16,
-    "y": 54,
+    "y": 53,
     "w": 8,
     "h": 6
    },
@@ -1123,7 +1005,7 @@
    "title": "/storage/EABF-DEDA (usb ssd, anime)",
    "gridPos": {
     "x": 0,
-    "y": 60,
+    "y": 59,
     "w": 16,
     "h": 6
    },
@@ -1153,7 +1035,7 @@
    "title": "free",
    "gridPos": {
     "x": 16,
-    "y": 60,
+    "y": 59,
     "w": 8,
     "h": 6
    },
