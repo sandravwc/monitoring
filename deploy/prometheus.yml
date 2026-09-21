@@ -12,6 +12,13 @@ scrape_configs:
   - job_name: prometheus
     static_configs: [{ targets: ['127.0.0.1:9090'] }]
 
+  - job_name: anubis
+    static_configs:
+      - targets: ['127.0.0.1:9917']
+        labels: { app: mealprep }
+      - targets: ['127.0.0.1:9091']
+        labels: { app: shoko }
+
   - job_name: node
     static_configs:
       - targets: ['127.0.0.1:9100']
