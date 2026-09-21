@@ -1,26 +1,26 @@
 # monitoring
 
-Prometheus + Alertmanager on the Poco, watching the Poco. Nagios shape
-(checks, thresholds, pushes) with Go static binaries that run rootless in
-Termux. Yes, the monitor sits on the box it monitors: the other phones are
-daily drivers, the workstation sleeps. The one thing that setup cannot see, a
-dead Poco, is covered by a cron on the workstation (`deadman.sh`). Alerts go
-to ntfy (account-free, ntfy formats Alertmanager's JSON itself, no bridge).
+Prometheus, Alertmanager, blackbox_exporter, node_exporter and Grafana on
+the Poco under Termux, rootless. Upstream `linux-arm64` static binaries,
+runit services, alerts to ntfy (`?template=alertmanager`, no bridge), a
+dead-man's check from the workstation.
 
 ```txt
- poco f5 pro                                                       workstation
-┌────────────────────────────────────────────────────────┐        ┌─────────────────────┐
-│ prometheus :9090 ──► alertmanager :9093 ─► tinyproxy :8118 ─► ntfy.sh │ ◄──ssh─┤ cron */30 deadman.sh│
-│   │  scrape                                            │        │  ntfy if unreachable│
-│   ├──► node_exporter :9100  (meminfo, /data, cpufreq,  │        └─────────────────────┘
-│   │       textfile: battery, load, cpu idle, thermal)   │
-│   └──► blackbox :9115 ── http/tcp ──► haproxy :8443 ──► anubis ──► shoko :8111 / mealprep :8090
-│                                       nfs :2049, sshd :8022, syncthing :8384
-└────────────────────────────────────────────────────────┘
+ poco f5 pro                                                        workstation
+┌──────────────────────────────────────────────────────────┐       ┌──────────────────────┐
+│ prometheus :9090 ─► alertmanager :9093 ─► tinyproxy :8118 ─► ntfy │ ◄─ssh─┤ timer */30 deadman.sh│
+│   │  scrape                                              │       │  ntfy if unreachable │
+│   ├─► node_exporter :9100  meminfo, /data, cpufreq       │       └──────────────────────┘
+│   │     textfile.sh: battery, load, cpu busy, thermal    │
+│   ├─► anubis metrics :9917 :9091                         │
+│   └─► blackbox :9115 ─ http/tcp ─► haproxy :8443 ─► anubis ─► shoko / mealprep; nfs, sshd
+│ grafana :3000 ─► prometheus                              │
+│ haproxy :8443: prom. alerts. (basic auth)  grafana. (own login)
+└──────────────────────────────────────────────────────────┘
 ```
 
-Nagios → here: NRPE = `node_exporter` on each host; check_http/tcp/ssl =
-`blackbox_exporter` from the monitor; service checks = rules in
+Nagios → here: NRPE = `node_exporter`; check_http/tcp/ssl =
+`blackbox_exporter`; service checks = rules in
 `alerts.yml`; notification commands = Alertmanager receivers; `textfile.sh` =
 custom checks via the textfile collector.
 
