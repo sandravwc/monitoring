@@ -25,7 +25,7 @@ for cpu in sorted(glob.glob("/sys/devices/system/cpu/cpu[0-9]*/cpuidle")):
     for f in glob.glob(cpu + "/state*/time"):
         try: idle += int(open(f).read())
         except OSError: pass
-    print(f'termux_cpu_idle_seconds_total{{cpu="{cpu.split("/")[-2][3:]}"}}', idle / 1e6)
+    print("termux_cpu_idle_seconds_total{cpu=\"%s\"} %s" % (cpu.split("/")[-2][3:], idle / 1e6))
 '
 for z in /sys/class/thermal/thermal_zone*; do
     t=$(cat $z/type 2>/dev/null) || continue
