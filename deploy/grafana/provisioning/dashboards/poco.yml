@@ -1,0 +1,6 @@
+apiVersion: 1
+providers:
+  - name: poco
+    folder: ''
+    type: file
+    options: { path: /data/data/com.termux/files/home/monitoring/repo/deploy/grafana/dashboards }

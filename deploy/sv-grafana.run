@@ -1,0 +1,6 @@
+#!/data/data/com.termux/files/usr/bin/sh
+exec 2>&1
+set -a; . $HOME/monitoring/grafana.env; set +a     # GF_SECURITY_ADMIN_PASSWORD=...
+export SSL_CERT_FILE=$PREFIX/etc/tls/cert.pem
+cd $PREFIX/share/grafana
+exec grafana server --homepath $PREFIX/share/grafana --config $HOME/monitoring/repo/deploy/grafana.ini
