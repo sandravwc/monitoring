@@ -42,6 +42,7 @@ scrape_configs:
 
   # public sites by name through haproxy + anubis (dns via tinyproxy, see blackbox.yml)
   - job_name: public
+    scrape_interval: 2m      # every probe is a real request through haproxy+anubis and shows in the traffic counters
     metrics_path: /probe
     params: { module: [http_public] }
     static_configs:
