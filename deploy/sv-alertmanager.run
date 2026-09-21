@@ -1,3 +1,4 @@
 #!/data/data/com.termux/files/usr/bin/sh
 exec 2>&1
+export SSL_CERT_FILE=$PREFIX/etc/tls/cert.pem   # Go looks in /etc/ssl, Termux keeps the CA bundle here
 exec $HOME/monitoring/bin/alertmanager --config.file=$HOME/monitoring/repo/deploy/alertmanager.yml --storage.path=$HOME/monitoring/alertmanager --web.listen-address=127.0.0.1:9093 --cluster.listen-address=""   # single node; cluster gossip needs netlink, denied on Android

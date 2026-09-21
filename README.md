@@ -102,7 +102,7 @@ Test an alert without breaking anything:
 - node_exporter ≥ 1.9 calls `open_tree()` (filepath-securejoin), Android seccomp answers SIGSYS, process dies on first scrape. 1.8.2 pinned
 - `/sys/class/thermal`: cpu zones readable, others not; `hwmon`, `pressure` denied
 - Go's pure resolver reads `/etc/resolv.conf`, Android has none, and port 53 can't be bound for a local forwarder: no Go binary here can resolve a hostname. Fix: `tinyproxy` (bionic, resolves fine) on 127.0.0.1:8118, `proxy_url` in Alertmanager's webhook and blackbox's `http_public` module. Scrape targets stay IPs
-- Go finds no CA bundle either (`/etc/ssl`): `SSL_CERT_FILE=$PREFIX/etc/tls/cert.pem` for blackbox
+- Go finds no CA bundle either (`/etc/ssl`): `SSL_CERT_FILE=$PREFIX/etc/tls/cert.pem` in every run script
 - Alertmanager: `--cluster.listen-address=""`, gossip setup needs netlink
 - `termux-battery-status` current sign: negative = charging on Xiaomi kernels; `BatteryDraining` alert relies on it
 - HyperOS kills Termux when idle: `termux-wake-lock` + battery optimization off for Termux, or the monitor vanishes with everything else (that is what `deadman.sh` is for)
