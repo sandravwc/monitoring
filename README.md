@@ -10,7 +10,7 @@ to ntfy (account-free, ntfy formats Alertmanager's JSON itself, no bridge).
 ```txt
  poco f5 pro                                                       workstation
 ┌────────────────────────────────────────────────────────┐        ┌─────────────────────┐
-│ prometheus :9090 ──► alertmanager :9093 ──► ntfy.sh    │ ◄──ssh─┤ cron */30 deadman.sh│
+│ prometheus :9090 ──► alertmanager :9093 ─► tinyproxy :8118 ─► ntfy.sh │ ◄──ssh─┤ cron */30 deadman.sh│
 │   │  scrape                                            │        │  ntfy if unreachable│
 │   ├──► node_exporter :9100  (meminfo, /data, cpufreq,  │        └─────────────────────┘
 │   │       textfile: battery, load, cpu idle, thermal)   │
@@ -33,6 +33,7 @@ deploy/alerts.yml            rules: down, probe failed, cert < 14d, disk, therma
 deploy/alertmanager.yml      route everything to ntfy, drop Watchdog; topic url read from ~/monitoring/ntfy.url
 deploy/blackbox.yml          http_2xx (follows redirects), tcp_connect
 deploy/textfile.sh           cron */1: battery, load (sysinfo), cpu idle (cpuidle sysfs), thermal -> ~/monitoring/textfile/termux.prom
+deploy/tinyproxy.conf        local forward proxy: DNS for the Go binaries (they can't resolve on Android)
 deploy/sv-*.run              runit services
 deploy/deadman.sh            workstation cron: ntfy when the Poco's Prometheus is unreachable
 ```
@@ -70,10 +71,11 @@ pseudo mounts.
 ### Poco: Prometheus, Alertmanager, blackbox
 
 ```sh
+pkg install tinyproxy
 for c in prometheus alertmanager blackbox_exporter; do ~/monitoring/repo/deploy/fetch.sh $c; done
 echo 'https://ntfy.sh/<topic>?template=alertmanager' > ~/monitoring/ntfy.url; chmod 600 ~/monitoring/ntfy.url
-for s in prometheus alertmanager blackbox; do mkdir -p $PREFIX/var/service/$s; cp ~/monitoring/repo/deploy/sv-$s.run $PREFIX/var/service/$s/run; done
-sv up prometheus alertmanager blackbox
+for s in tinyproxy prometheus alertmanager blackbox; do mkdir -p $PREFIX/var/service/$s; cp ~/monitoring/repo/deploy/sv-$s.run $PREFIX/var/service/$s/run; done
+sv up tinyproxy prometheus alertmanager blackbox
 ~/monitoring/bin/prometheus --config.file ~/monitoring/repo/deploy/prometheus.yml --check-config   # promtool is in the tarball too
 ```
 
@@ -99,7 +101,7 @@ Test an alert without breaking anything:
 
 - node_exporter ≥ 1.9 calls `open_tree()` (filepath-securejoin), Android seccomp answers SIGSYS, process dies on first scrape. 1.8.2 pinned
 - `/sys/class/thermal`: cpu zones readable, others not; `hwmon`, `pressure` denied
-- Go's pure resolver reads `/etc/resolv.conf`, Android has none: blackbox can't resolve names. Public sites are probed by LAN ip with SNI + `Host` pinned (`https_*` modules). DNS and NAT loopback stay unchecked from the phone
+- Go's pure resolver reads `/etc/resolv.conf`, Android has none, and port 53 can't be bound for a local forwarder: no Go binary here can resolve a hostname. Fix: `tinyproxy` (bionic, resolves fine) on 127.0.0.1:8118, `proxy_url` in Alertmanager's webhook and blackbox's `http_public` module. Scrape targets stay IPs
 - Go finds no CA bundle either (`/etc/ssl`): `SSL_CERT_FILE=$PREFIX/etc/tls/cert.pem` for blackbox
 - Alertmanager: `--cluster.listen-address=""`, gossip setup needs netlink
 - `termux-battery-status` current sign: negative = charging on Xiaomi kernels; `BatteryDraining` alert relies on it

@@ -37,16 +37,14 @@ scrape_configs:
       - { source_labels: [__param_target], target_label: instance }
       - { target_label: __address__, replacement: 127.0.0.1:9115 }
 
-  # public sites through haproxy + anubis; name via SNI/Host, see blackbox.yml
-  - job_name: https_shoko
+  # public sites by name through haproxy + anubis (dns via tinyproxy, see blackbox.yml)
+  - job_name: public
     metrics_path: /probe
-    params: { module: [https_shoko] }
-    static_configs: [{ targets: ['https://192.168.1.106:8443/'], labels: { site: shoko.poco.xn--bdk.dog } }]
-    relabel_configs: *bb
-  - job_name: https_mealprep
-    metrics_path: /probe
-    params: { module: [https_mealprep] }
-    static_configs: [{ targets: ['https://192.168.1.106:8443/'], labels: { site: poco.xn--bdk.dog } }]
+    params: { module: [http_public] }
+    static_configs:
+      - targets:
+          - https://poco.xn--bdk.dog:8443/
+          - https://shoko.poco.xn--bdk.dog:8443/
     relabel_configs: *bb
 
   - job_name: tcp

@@ -14,4 +14,5 @@ receivers:
     webhook_configs:
       - url_file: /data/data/com.termux/files/home/monitoring/ntfy.url
         send_resolved: true
+        http_config: { proxy_url: http://127.0.0.1:8118 }   # dns, see tinyproxy.conf
   - name: blackhole
