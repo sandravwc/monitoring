@@ -29,8 +29,8 @@
    "gridPos": {
     "x": 0,
     "y": 1,
-    "w": 16,
-    "h": 5
+    "w": 24,
+    "h": 6
    },
    "datasource": {
     "type": "prometheus",
@@ -86,7 +86,12 @@
     },
     "colorMode": "background",
     "graphMode": "none",
-    "textMode": "value_and_name"
+    "textMode": "value_and_name",
+    "text": {
+     "titleSize": 18,
+     "valueSize": 34
+    },
+    "justifyMode": "center"
    }
   },
   {
@@ -94,9 +99,9 @@
    "type": "stat",
    "title": "cert days left",
    "gridPos": {
-    "x": 16,
-    "y": 1,
-    "w": 4,
+    "x": 0,
+    "y": 7,
+    "w": 12,
     "h": 5
    },
    "datasource": {
@@ -143,7 +148,12 @@
     },
     "colorMode": "background",
     "graphMode": "none",
-    "textMode": "value_and_name"
+    "textMode": "value_and_name",
+    "text": {
+     "titleSize": 18,
+     "valueSize": 34
+    },
+    "justifyMode": "center"
    }
   },
   {
@@ -151,9 +161,9 @@
    "type": "stat",
    "title": "firing",
    "gridPos": {
-    "x": 20,
-    "y": 1,
-    "w": 4,
+    "x": 12,
+    "y": 7,
+    "w": 12,
     "h": 5
    },
    "datasource": {
@@ -196,7 +206,12 @@
     },
     "colorMode": "background",
     "graphMode": "none",
-    "textMode": "value_and_name"
+    "textMode": "value_and_name",
+    "text": {
+     "titleSize": 18,
+     "valueSize": 34
+    },
+    "justifyMode": "center"
    }
   },
   {
@@ -206,7 +221,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 6,
+    "y": 13,
     "w": 24,
     "h": 1
    },
@@ -218,7 +233,7 @@
    "title": "requests / min per backend",
    "gridPos": {
     "x": 0,
-    "y": 7,
+    "y": 14,
     "w": 12,
     "h": 7
    },
@@ -249,7 +264,7 @@
    "title": "responses / min by status",
    "gridPos": {
     "x": 12,
-    "y": 7,
+    "y": 14,
     "w": 12,
     "h": 7
    },
@@ -280,7 +295,7 @@
    "title": "requests today",
    "gridPos": {
     "x": 0,
-    "y": 14,
+    "y": 21,
     "w": 8,
     "h": 5
    },
@@ -320,7 +335,12 @@
     },
     "colorMode": "background",
     "graphMode": "none",
-    "textMode": "value_and_name"
+    "textMode": "value_and_name",
+    "text": {
+     "titleSize": 18,
+     "valueSize": 34
+    },
+    "justifyMode": "center"
    }
   },
   {
@@ -329,7 +349,7 @@
    "title": "requests this week",
    "gridPos": {
     "x": 8,
-    "y": 14,
+    "y": 21,
     "w": 8,
     "h": 5
    },
@@ -369,7 +389,12 @@
     },
     "colorMode": "background",
     "graphMode": "none",
-    "textMode": "value_and_name"
+    "textMode": "value_and_name",
+    "text": {
+     "titleSize": 18,
+     "valueSize": 34
+    },
+    "justifyMode": "center"
    }
   },
   {
@@ -378,7 +403,7 @@
    "title": "egress / min",
    "gridPos": {
     "x": 16,
-    "y": 14,
+    "y": 21,
     "w": 8,
     "h": 5
    },
@@ -410,7 +435,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 19,
+    "y": 26,
     "w": 24,
     "h": 1
    },
@@ -422,8 +447,8 @@
    "title": "shoko",
    "gridPos": {
     "x": 0,
-    "y": 20,
-    "w": 6,
+    "y": 27,
+    "w": 8,
     "h": 5
    },
    "datasource": {
@@ -480,7 +505,12 @@
     },
     "colorMode": "background",
     "graphMode": "none",
-    "textMode": "value_and_name"
+    "textMode": "value_and_name",
+    "text": {
+     "titleSize": 18,
+     "valueSize": 34
+    },
+    "justifyMode": "center"
    }
   },
   {
@@ -488,9 +518,9 @@
    "type": "timeseries",
    "title": "anubis-shoko: proxied / challenged per min",
    "gridPos": {
-    "x": 6,
-    "y": 20,
-    "w": 9,
+    "x": 8,
+    "y": 27,
+    "w": 8,
     "h": 5
    },
    "datasource": {
@@ -526,9 +556,9 @@
    "type": "timeseries",
    "title": "shoko backend: requests / min",
    "gridPos": {
-    "x": 15,
-    "y": 20,
-    "w": 9,
+    "x": 16,
+    "y": 27,
+    "w": 8,
     "h": 5
    },
    "datasource": {
@@ -566,7 +596,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 25,
+    "y": 32,
     "w": 24,
     "h": 1
    },
@@ -578,8 +608,8 @@
    "title": "mealprep",
    "gridPos": {
     "x": 0,
-    "y": 26,
-    "w": 6,
+    "y": 33,
+    "w": 8,
     "h": 5
    },
    "datasource": {
@@ -636,7 +666,12 @@
     },
     "colorMode": "background",
     "graphMode": "none",
-    "textMode": "value_and_name"
+    "textMode": "value_and_name",
+    "text": {
+     "titleSize": 18,
+     "valueSize": 34
+    },
+    "justifyMode": "center"
    }
   },
   {
@@ -644,9 +679,9 @@
    "type": "timeseries",
    "title": "anubis-mealprep: proxied / challenged per min",
    "gridPos": {
-    "x": 6,
-    "y": 26,
-    "w": 9,
+    "x": 8,
+    "y": 33,
+    "w": 8,
     "h": 5
    },
    "datasource": {
@@ -682,9 +717,9 @@
    "type": "timeseries",
    "title": "mealprep backend: requests / min",
    "gridPos": {
-    "x": 15,
-    "y": 26,
-    "w": 9,
+    "x": 16,
+    "y": 33,
+    "w": 8,
     "h": 5
    },
    "datasource": {
@@ -722,7 +757,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 31,
+    "y": 38,
     "w": 24,
     "h": 1
    },
@@ -734,7 +769,7 @@
    "title": "cpu busy per core",
    "gridPos": {
     "x": 0,
-    "y": 32,
+    "y": 39,
     "w": 8,
     "h": 7
    },
@@ -767,7 +802,7 @@
    "title": "load",
    "gridPos": {
     "x": 8,
-    "y": 32,
+    "y": 39,
     "w": 8,
     "h": 7
    },
@@ -810,7 +845,7 @@
    "title": "memory",
    "gridPos": {
     "x": 16,
-    "y": 32,
+    "y": 39,
     "w": 8,
     "h": 7
    },
@@ -849,7 +884,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 39,
+    "y": 46,
     "w": 24,
     "h": 1
    },
@@ -861,7 +896,7 @@
    "title": "battery",
    "gridPos": {
     "x": 0,
-    "y": 40,
+    "y": 47,
     "w": 8,
     "h": 6
    },
@@ -894,7 +929,7 @@
    "title": "battery current (neg = charging)",
    "gridPos": {
     "x": 8,
-    "y": 40,
+    "y": 47,
     "w": 8,
     "h": 6
    },
@@ -925,7 +960,7 @@
    "title": "temperature",
    "gridPos": {
     "x": 16,
-    "y": 40,
+    "y": 47,
     "w": 8,
     "h": 6
    },
@@ -964,7 +999,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 46,
+    "y": 53,
     "w": 24,
     "h": 1
    },
@@ -976,7 +1011,7 @@
    "title": "free",
    "gridPos": {
     "x": 0,
-    "y": 47,
+    "y": 54,
     "w": 12,
     "h": 6
    },
@@ -1007,7 +1042,7 @@
    "title": "free now",
    "gridPos": {
     "x": 12,
-    "y": 47,
+    "y": 54,
     "w": 12,
     "h": 6
    },
@@ -1055,7 +1090,12 @@
     },
     "colorMode": "background",
     "graphMode": "none",
-    "textMode": "value_and_name"
+    "textMode": "value_and_name",
+    "text": {
+     "titleSize": 18,
+     "valueSize": 34
+    },
+    "justifyMode": "center"
    }
   }
  ],
