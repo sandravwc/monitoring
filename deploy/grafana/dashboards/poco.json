@@ -11,336 +11,12 @@
  "panels": [
   {
    "id": 1,
-   "type": "timeseries",
-   "title": "cpu busy per core",
-   "gridPos": {
-    "x": 0,
-    "y": 0,
-    "w": 12,
-    "h": 7
-   },
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prom"
-   },
-   "targets": [
-    {
-     "refId": "A",
-     "expr": "termux_cpu_busy_ratio",
-     "legendFormat": "cpu{{cpu}}"
-    }
-   ],
-   "fieldConfig": {
-    "defaults": {
-     "unit": "percentunit",
-     "max": 1,
-     "min": 0
-    },
-    "overrides": []
-   },
-   "options": {}
-  },
-  {
-   "id": 2,
-   "type": "timeseries",
-   "title": "load",
-   "gridPos": {
-    "x": 12,
-    "y": 0,
-    "w": 12,
-    "h": 7
-   },
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prom"
-   },
-   "targets": [
-    {
-     "refId": "A",
-     "expr": "termux_load1",
-     "legendFormat": "1m"
-    },
-    {
-     "refId": "B",
-     "expr": "termux_load5",
-     "legendFormat": "5m"
-    },
-    {
-     "refId": "C",
-     "expr": "termux_load15",
-     "legendFormat": "15m"
-    }
-   ],
-   "fieldConfig": {
-    "defaults": {},
-    "overrides": []
-   },
-   "options": {}
-  },
-  {
-   "id": 3,
-   "type": "timeseries",
-   "title": "memory",
-   "gridPos": {
-    "x": 0,
-    "y": 7,
-    "w": 12,
-    "h": 7
-   },
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prom"
-   },
-   "targets": [
-    {
-     "refId": "A",
-     "expr": "node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes",
-     "legendFormat": "used"
-    },
-    {
-     "refId": "B",
-     "expr": "node_memory_SwapTotal_bytes - node_memory_SwapFree_bytes",
-     "legendFormat": "swap used"
-    }
-   ],
-   "fieldConfig": {
-    "defaults": {
-     "unit": "bytes"
-    },
-    "overrides": []
-   },
-   "options": {}
-  },
-  {
-   "id": 4,
-   "type": "timeseries",
-   "title": "cpu temperature",
-   "gridPos": {
-    "x": 12,
-    "y": 7,
-    "w": 12,
-    "h": 7
-   },
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prom"
-   },
-   "targets": [
-    {
-     "refId": "A",
-     "expr": "max(termux_cpu_temperature_celsius)",
-     "legendFormat": "max zone"
-    },
-    {
-     "refId": "B",
-     "expr": "termux_battery_temperature_celsius",
-     "legendFormat": "battery"
-    }
-   ],
-   "fieldConfig": {
-    "defaults": {
-     "unit": "celsius"
-    },
-    "overrides": []
-   },
-   "options": {}
-  },
-  {
-   "id": 5,
-   "type": "timeseries",
-   "title": "battery",
-   "gridPos": {
-    "x": 0,
-    "y": 14,
-    "w": 8,
-    "h": 7
-   },
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prom"
-   },
-   "targets": [
-    {
-     "refId": "A",
-     "expr": "termux_battery_percent",
-     "legendFormat": "%"
-    }
-   ],
-   "fieldConfig": {
-    "defaults": {
-     "unit": "percent",
-     "max": 100,
-     "min": 0
-    },
-    "overrides": []
-   },
-   "options": {}
-  },
-  {
-   "id": 6,
-   "type": "timeseries",
-   "title": "battery current (neg = charging)",
-   "gridPos": {
-    "x": 8,
-    "y": 14,
-    "w": 8,
-    "h": 7
-   },
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prom"
-   },
-   "targets": [
-    {
-     "refId": "A",
-     "expr": "termux_battery_current_amps",
-     "legendFormat": "A"
-    }
-   ],
-   "fieldConfig": {
-    "defaults": {
-     "unit": "amp"
-    },
-    "overrides": []
-   },
-   "options": {}
-  },
-  {
-   "id": 7,
-   "type": "timeseries",
-   "title": "/data free",
-   "gridPos": {
-    "x": 16,
-    "y": 14,
-    "w": 8,
-    "h": 7
-   },
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prom"
-   },
-   "targets": [
-    {
-     "refId": "A",
-     "expr": "node_filesystem_avail_bytes{mountpoint=\"/data\"}",
-     "legendFormat": "free"
-    }
-   ],
-   "fieldConfig": {
-    "defaults": {
-     "unit": "bytes"
-    },
-    "overrides": []
-   },
-   "options": {}
-  },
-  {
-   "id": 8,
    "type": "stat",
    "title": "probes",
    "gridPos": {
     "x": 0,
-    "y": 21,
+    "y": 0,
     "w": 16,
-    "h": 7
-   },
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prom"
-   },
-   "targets": [
-    {
-     "refId": "A",
-     "expr": "probe_success",
-     "legendFormat": "{{instance}}"
-    }
-   ],
-   "fieldConfig": {
-    "defaults": {
-     "max": 1,
-     "min": 0,
-     "thresholds": {
-      "mode": "absolute",
-      "steps": [
-       {
-        "color": "red",
-        "value": null
-       },
-       {
-        "color": "green",
-        "value": 1
-       }
-      ]
-     }
-    },
-    "overrides": []
-   },
-   "options": {
-    "reduceOptions": {
-     "calcs": [
-      "lastNotNull"
-     ]
-    },
-    "colorMode": "background"
-   }
-  },
-  {
-   "id": 9,
-   "type": "stat",
-   "title": "cert days left",
-   "gridPos": {
-    "x": 16,
-    "y": 21,
-    "w": 8,
-    "h": 7
-   },
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prom"
-   },
-   "targets": [
-    {
-     "refId": "A",
-     "expr": "min((probe_ssl_earliest_cert_expiry - time()) / 86400)",
-     "legendFormat": "days"
-    }
-   ],
-   "fieldConfig": {
-    "defaults": {
-     "unit": "d",
-     "thresholds": {
-      "mode": "absolute",
-      "steps": [
-       {
-        "color": "green",
-        "value": null
-       },
-       {
-        "color": "red",
-        "value": 1
-       }
-      ]
-     }
-    },
-    "overrides": []
-   },
-   "options": {
-    "reduceOptions": {
-     "calcs": [
-      "lastNotNull"
-     ]
-    },
-    "colorMode": "background"
-   }
-  },
-  {
-   "id": 10,
-   "type": "stat",
-   "title": "firing alerts",
-   "gridPos": {
-    "x": 0,
-    "y": 27,
-    "w": 8,
     "h": 5
    },
    "datasource": {
@@ -350,8 +26,10 @@
    "targets": [
     {
      "refId": "A",
-     "expr": "count(ALERTS{alertstate=\"firing\", alertname!=\"Watchdog\"}) or vector(0)",
-     "legendFormat": "firing"
+     "expr": "probe_success",
+     "legendFormat": "{{name}}",
+     "instant": true,
+     "range": false
     }
    ],
    "fieldConfig": {
@@ -364,8 +42,76 @@
         "value": null
        },
        {
-        "color": "orange",
-        "value": 14
+        "color": "green",
+        "value": 1
+       }
+      ]
+     },
+     "mappings": [
+      {
+       "type": "value",
+       "options": {
+        "0": {
+         "text": "DOWN",
+         "color": "red"
+        },
+        "1": {
+         "text": "UP",
+         "color": "green"
+        }
+       }
+      }
+     ]
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ]
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value_and_name"
+   }
+  },
+  {
+   "id": 2,
+   "type": "stat",
+   "title": "cert days left",
+   "gridPos": {
+    "x": 16,
+    "y": 0,
+    "w": 4,
+    "h": 5
+   },
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "min by (name) ((probe_ssl_earliest_cert_expiry - time()) / 86400)",
+     "legendFormat": "{{name}}",
+     "instant": true,
+     "range": false
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "decimals": 0,
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "red",
+        "value": null
+       },
+       {
+        "color": "yellow",
+        "value": 3
        },
        {
         "color": "green",
@@ -382,17 +128,19 @@
       "lastNotNull"
      ]
     },
-    "colorMode": "background"
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value_and_name"
    }
   },
   {
-   "id": 11,
-   "type": "timeseries",
-   "title": "anubis challenges / min",
+   "id": 3,
+   "type": "stat",
+   "title": "firing",
    "gridPos": {
-    "x": 8,
-    "y": 27,
-    "w": 16,
+    "x": 20,
+    "y": 0,
+    "w": 4,
     "h": 5
    },
    "datasource": {
@@ -402,12 +150,483 @@
    "targets": [
     {
      "refId": "A",
-     "expr": "sum by (app) (rate(anubis_challenges_issued_total[5m])) * 60",
-     "legendFormat": "{{app}}"
+     "expr": "count(ALERTS{alertstate=\"firing\", alertname!=\"Watchdog\"}) or vector(0)",
+     "legendFormat": "alerts",
+     "instant": true,
+     "range": false
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "decimals": 0,
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       },
+       {
+        "color": "red",
+        "value": 1
+       }
+      ]
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ]
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value_and_name"
+   }
+  },
+  {
+   "id": 4,
+   "type": "timeseries",
+   "title": "requests / min per backend (haproxy)",
+   "gridPos": {
+    "x": 0,
+    "y": 5,
+    "w": 12,
+    "h": 7
+   },
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "rate(haproxy_backend_sessions_total[5m]) * 60",
+     "legendFormat": "{{backend}}",
+     "instant": false,
+     "range": true
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "reqpm"
+    },
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 5,
+   "type": "timeseries",
+   "title": "responses / min by status (haproxy)",
+   "gridPos": {
+    "x": 12,
+    "y": 5,
+    "w": 12,
+    "h": 7
+   },
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum by (code) (rate(haproxy_backend_http_responses_total[5m])) * 60",
+     "legendFormat": "{{code}}",
+     "instant": false,
+     "range": true
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "reqpm"
+    },
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 6,
+   "type": "stat",
+   "title": "requests today",
+   "gridPos": {
+    "x": 0,
+    "y": 12,
+    "w": 8,
+    "h": 5
+   },
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum by (backend) (increase(haproxy_backend_sessions_total[1d]))",
+     "legendFormat": "{{backend}}",
+     "instant": true,
+     "range": false
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "decimals": 0,
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ]
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value_and_name"
+   }
+  },
+  {
+   "id": 7,
+   "type": "stat",
+   "title": "requests this week",
+   "gridPos": {
+    "x": 8,
+    "y": 12,
+    "w": 8,
+    "h": 5
+   },
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum by (backend) (increase(haproxy_backend_sessions_total[7d]))",
+     "legendFormat": "{{backend}}",
+     "instant": true,
+     "range": false
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "decimals": 0,
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ]
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value_and_name"
+   }
+  },
+  {
+   "id": 8,
+   "type": "timeseries",
+   "title": "anubis: proxied / challenged per min",
+   "gridPos": {
+    "x": 16,
+    "y": 12,
+    "w": 8,
+    "h": 5
+   },
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum by (app) (rate(anubis_proxied_requests_total[5m])) * 60",
+     "legendFormat": "{{app}} proxied",
+     "instant": false,
+     "range": true
+    },
+    {
+     "refId": "B",
+     "expr": "sum by (app) (rate(anubis_challenges_issued[5m])) * 60",
+     "legendFormat": "{{app}} challenged",
+     "instant": false,
+     "range": true
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "reqpm"
+    },
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 9,
+   "type": "timeseries",
+   "title": "cpu busy per core",
+   "gridPos": {
+    "x": 0,
+    "y": 17,
+    "w": 12,
+    "h": 7
+   },
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "termux_cpu_busy_ratio",
+     "legendFormat": "cpu{{cpu}}",
+     "instant": false,
+     "range": true
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit",
+     "max": 1,
+     "min": 0
+    },
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 10,
+   "type": "timeseries",
+   "title": "load",
+   "gridPos": {
+    "x": 12,
+    "y": 17,
+    "w": 12,
+    "h": 7
+   },
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "termux_load1",
+     "legendFormat": "1m",
+     "instant": false,
+     "range": true
+    },
+    {
+     "refId": "B",
+     "expr": "termux_load5",
+     "legendFormat": "5m",
+     "instant": false,
+     "range": true
+    },
+    {
+     "refId": "C",
+     "expr": "termux_load15",
+     "legendFormat": "15m",
+     "instant": false,
+     "range": true
     }
    ],
    "fieldConfig": {
     "defaults": {},
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 11,
+   "type": "timeseries",
+   "title": "memory",
+   "gridPos": {
+    "x": 0,
+    "y": 24,
+    "w": 12,
+    "h": 7
+   },
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes",
+     "legendFormat": "used",
+     "instant": false,
+     "range": true
+    },
+    {
+     "refId": "B",
+     "expr": "node_memory_SwapTotal_bytes - node_memory_SwapFree_bytes",
+     "legendFormat": "swap used",
+     "instant": false,
+     "range": true
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "bytes"
+    },
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 12,
+   "type": "timeseries",
+   "title": "temperature",
+   "gridPos": {
+    "x": 12,
+    "y": 24,
+    "w": 12,
+    "h": 7
+   },
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "max(termux_cpu_temperature_celsius)",
+     "legendFormat": "cpu max zone",
+     "instant": false,
+     "range": true
+    },
+    {
+     "refId": "B",
+     "expr": "termux_battery_temperature_celsius",
+     "legendFormat": "battery",
+     "instant": false,
+     "range": true
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "celsius"
+    },
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 13,
+   "type": "timeseries",
+   "title": "battery",
+   "gridPos": {
+    "x": 0,
+    "y": 31,
+    "w": 8,
+    "h": 7
+   },
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "termux_battery_percent",
+     "legendFormat": "%",
+     "instant": false,
+     "range": true
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percent",
+     "max": 100,
+     "min": 0
+    },
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 14,
+   "type": "timeseries",
+   "title": "battery current (neg = charging)",
+   "gridPos": {
+    "x": 8,
+    "y": 31,
+    "w": 8,
+    "h": 7
+   },
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "termux_battery_current_amps",
+     "legendFormat": "A",
+     "instant": false,
+     "range": true
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "amp"
+    },
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 15,
+   "type": "timeseries",
+   "title": "disk free",
+   "gridPos": {
+    "x": 16,
+    "y": 31,
+    "w": 8,
+    "h": 7
+   },
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "node_filesystem_avail_bytes{mountpoint=~\"/data|/storage/.*\"}",
+     "legendFormat": "{{mountpoint}}",
+     "instant": false,
+     "range": true
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "bytes"
+    },
     "overrides": []
    },
    "options": {}

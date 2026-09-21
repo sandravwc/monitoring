@@ -40,6 +40,22 @@ for cpu in sorted(glob.glob("/sys/devices/system/cpu/cpu[0-9]*/cpuidle")):
         print("termux_cpu_busy_ratio{cpu=\"%s\"} %.3f" % (n, busy))
 cur["t"] = now; j.dump(cur, open(state, "w"))
 '
+# haproxy per-backend counters from its stats socket (no PROMEX in the termux build). needs "stats socket <path>" in 00-base.cfg
+python3 - <<'PY'
+import socket, csv, io
+try:
+    s = socket.socket(socket.AF_UNIX); s.settimeout(2); s.connect("/data/data/com.termux/files/home/haproxy.sock"); s.sendall(b"show stat\n")
+    data = b"".join(iter(lambda: s.recv(65536), b""))
+    for r in csv.DictReader(io.StringIO(data.decode().lstrip("# "))):
+        if r["svname"] != "BACKEND" or r["pxname"] in ("stats",): continue
+        b = r["pxname"]
+        print('haproxy_backend_sessions_total{backend="%s"} %s' % (b, r["stot"] or 0))
+        for c in ("1xx", "2xx", "3xx", "4xx", "5xx"):
+            print('haproxy_backend_http_responses_total{backend="%s",code="%s"} %s' % (b, c, r["hrsp_" + c] or 0))
+        print('haproxy_backend_bytes_out_total{backend="%s"} %s' % (b, r["bout"] or 0))
+except Exception as e:
+    print("# haproxy stats: %s" % e)
+PY
 for z in /sys/class/thermal/thermal_zone*; do
     t=$(cat $z/type 2>/dev/null) || continue
     case "$t" in cpu*) v=$(cat $z/temp 2>/dev/null) || continue; echo "termux_cpu_temperature_celsius{zone=\"$t\"} $(echo "$v / 1000" | bc -l | cut -c1-5)";; esac

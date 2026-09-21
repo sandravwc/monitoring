@@ -16,19 +16,19 @@ groups:
         expr: probe_success == 0
         for: 3m
         labels: { severity: critical }
-        annotations: { summary: "{{ $labels.instance }} probe failed" }
+        annotations: { summary: "{{ $labels.name }} down ({{ $labels.instance }})" }
 
       - alert: CertExpiresSoon
         expr: (probe_ssl_earliest_cert_expiry - time()) / 86400 < 14
         for: 1h
         labels: { severity: warning }
-        annotations: { summary: "{{ $labels.instance }} cert expires in {{ $value | printf \"%.0f\" }} days" }
+        annotations: { summary: "{{ $labels.name }} cert expires in {{ $value | printf \"%.0f\" }} days" }
 
       - alert: DiskAlmostFull
-        expr: node_filesystem_avail_bytes{mountpoint="/data"} / node_filesystem_size_bytes < 0.10
+        expr: node_filesystem_avail_bytes{mountpoint=~"/data|/storage/.*"} / node_filesystem_size_bytes < 0.10
         for: 10m
         labels: { severity: warning }
-        annotations: { summary: "{{ $labels.host }} /data below 10% free" }
+        annotations: { summary: "{{ $labels.host }} {{ $labels.mountpoint }} below 10% free" }
 
       - alert: HotPhone
         expr: max by (host) (termux_cpu_temperature_celsius) > 75

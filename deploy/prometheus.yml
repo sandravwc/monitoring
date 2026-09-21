@@ -25,13 +25,13 @@ scrape_configs:
         labels: { host: poco }
 
   # blackbox: probes go through the real ports (haproxy, anubis, dns) even though it is the same box
+  # "name" is what dashboards and alerts show
   - job_name: http
     metrics_path: /probe
     params: { module: [http_2xx] }
     static_configs:
-      - targets:
-          - http://192.168.1.106:8111/api/v3/Init/Status   # shoko api, lan
-          - http://192.168.1.106:8090/                # mealprep app, lan
+      - { targets: ['http://192.168.1.106:8111/api/v3/Init/Status'], labels: { name: 'shoko api' } }
+      - { targets: ['http://192.168.1.106:8090/'], labels: { name: 'mealprep app' } }
     relabel_configs: &bb
       - { source_labels: [__address__], target_label: __param_target }
       - { source_labels: [__param_target], target_label: instance }
@@ -42,16 +42,15 @@ scrape_configs:
     metrics_path: /probe
     params: { module: [http_public] }
     static_configs:
-      - targets:
-          - https://poco.xn--bdk.dog:8443/
-          - https://shoko.poco.xn--bdk.dog:8443/
+      - { targets: ['https://poco.xn--bdk.dog:8443/'], labels: { name: 'mealprep public' } }
+      - { targets: ['https://shoko.poco.xn--bdk.dog:8443/'], labels: { name: 'shoko public' } }
+      - { targets: ['https://grafana.poco.xn--bdk.dog:8443/login'], labels: { name: 'grafana public' } }
     relabel_configs: *bb
 
   - job_name: tcp
     metrics_path: /probe
     params: { module: [tcp_connect] }
     static_configs:
-      - targets:
-          - 192.168.1.106:8022    # poco sshd
-          - 192.168.1.106:2049    # poco nfs export
+      - { targets: ['192.168.1.106:8022'], labels: { name: 'sshd' } }
+      - { targets: ['192.168.1.106:2049'], labels: { name: 'nfs' } }
     relabel_configs: *bb
