@@ -19,6 +19,10 @@ dead-man's check from the workstation.
 └──────────────────────────────────────────────────────────┘
 ```
 
+Service graph, from `dashboards/topology.py` (same source as the Grafana canvas):
+
+![topology](dashboards/topology.png)
+
 Nagios → here: NRPE = `node_exporter`; check_http/tcp/ssl =
 `blackbox_exporter`; service checks = rules in
 `alerts.yml`; notification commands = Alertmanager receivers; `textfile.sh` =
@@ -37,7 +41,11 @@ deploy/sv-haproxy-exporter.run  haproxy_exporter on the stats socket (termux hap
 deploy/tinyproxy.conf        local forward proxy: DNS for the Go binaries (they can't resolve on Android)
 deploy/haproxy.cfg           backends prom, alerts, grafana; symlinked into ~/haproxy.d/
 deploy/grafana.ini           grafana on 127.0.0.1:3000, data in ~/monitoring/grafana, provisioning from the repo
-deploy/grafana/              provisioned prometheus datasource; dashboards come from `sandravwc/grafana-dashboards` cloned to ~/monitoring/dashboards
+deploy/grafana/              provisioned prometheus datasource + dashboard provider (reads ~/monitoring/dashboards, one folder per subdirectory)
+deploy/grafana-dashboards.post-receive  phone-side hook: push to grafana-dashboards checks its json out into ~/monitoring/dashboards
+dashboards/gen.py            generates grafana-dashboards/poco/poco.json (panels + service graph canvas)
+dashboards/topology.py       service graph, diagrams DSL; renders dashboards/topology.png and feeds the canvas
+dashboards/dev               save-to-preview loop: regenerate, copy json to the phone
 deploy/sv-*.run              runit services
 deploy/deadman.sh            workstation cron: ntfy when the Poco's Prometheus is unreachable
 ```
@@ -101,7 +109,8 @@ pkg install grafana
 echo 'GF_SECURITY_ADMIN_PASSWORD=<pw>' > ~/monitoring/grafana.env; chmod 600 ~/monitoring/grafana.env
 printf 'userlist monitoring\n    user mrk insecure-password <pw>\n' > ~/haproxy.d/05-auth.cfg; chmod 600 ~/haproxy.d/05-auth.cfg
 mkdir -p ~/monitoring/grafana $PREFIX/var/service/grafana
-git init --bare -b master ~/git/grafana-dashboards.git   # push-to-deploy target, hook from grafana-dashboards/deploy/post-receive
+git init --bare -b master ~/git/grafana-dashboards.git   # push-to-deploy target
+cp ~/monitoring/repo/deploy/grafana-dashboards.post-receive ~/git/grafana-dashboards.git/hooks/post-receive
 cp ~/monitoring/repo/deploy/sv-grafana.run $PREFIX/var/service/grafana/run; sv up grafana
 ln -s ~/monitoring/repo/deploy/haproxy.cfg ~/haproxy.d/30-monitoring.cfg; haproxy -c -f ~/haproxy.d && sv restart haproxy
 # dns: prom, alerts, grafana as CNAME -> poco
@@ -124,7 +133,10 @@ Test an alert without breaking anything:
 - Change a rule/target: edit in the workstation clone, push, `git pull` on the Nothing, `sv restart prometheus` (or `kill -HUP` for a config reload)
 - Logs: `$PREFIX/var/log/sv/<svc>/current`
 - Update a binary: `fetch.sh <name>`, `sv restart <svc>`; grafana via `pkg upgrade`
-- Dashboards: `sandravwc/grafana-dashboards`, `gen.py` → JSON. `git push` deploys (post-receive hook on the phone), `./dev` deploys on every save
+- Dashboards: source here in `dashboards/`, JSON in `sandravwc/grafana-dashboards` (checked out beside this repo).
+  `dashboards/dev` regenerates on every save and copies the JSON to the phone for preview.
+  Done: commit + push here (source) and in grafana-dashboards (JSON; that push deploys via the hook).
+  Workstation needs graphviz and `python3 -m venv dashboards/.venv && dashboards/.venv/bin/pip install diagrams`
 - Dead monitor: `deadman.sh` from the workstation, systemd user timer (`deploy/monitoring-deadman.{service,timer}` → `~/.config/systemd/user/`, `systemctl --user enable --now monitoring-deadman.timer`), topic url in `~/.config/monitoring-ntfy.url`. Only fires while the workstation is awake; the `Watchdog` alert (always firing, blackholed) shows in `/alerts` that rules evaluate
 - Data: 90 d retention, ~1 GB/yr at this size
 

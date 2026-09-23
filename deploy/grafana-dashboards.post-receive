@@ -1,0 +1,8 @@
+#!/data/data/com.termux/files/usr/bin/sh
+# Phone side: ~/git/grafana-dashboards.git/hooks/post-receive. On push: check out the json, grafana's file provider reloads.
+set -e
+dst=$HOME/monitoring/dashboards
+rev=$(git rev-parse --short master)    # before cd: GIT_DIR is relative in hooks
+mkdir -p $dst
+git --work-tree=$dst checkout -f master
+echo "deployed $rev -> $dst"

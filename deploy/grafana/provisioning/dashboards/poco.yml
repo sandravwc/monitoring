@@ -1,6 +1,7 @@
 apiVersion: 1
 providers:
   - name: poco
-    folder: ''
     type: file
-    options: { path: /data/data/com.termux/files/home/monitoring/dashboards }   # clone of sandravwc/grafana-dashboards
+    options:
+      foldersFromFilesStructure: true    # one grafana folder per subdirectory of grafana-dashboards
+      path: /data/data/com.termux/files/home/monitoring/dashboards   # checkout of sandravwc/grafana-dashboards, see deploy/grafana-dashboards.post-receive

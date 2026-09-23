@@ -1,0 +1,12 @@
+#!/bin/sh
+# Save gen.py or topology.py: regenerates topology.png + ../../grafana-dashboards/poco/poco.json, copies the json to the phone.
+# Live in ~10 s, reload the tab. No commit. Ctrl-C to stop.
+# When happy: commit + push here (source) and in grafana-dashboards (json; its push deploys via the phone's post-receive hook).
+cd "$(dirname "$0")"
+PY=.venv/bin/python; [ -x $PY ] || PY=python3
+last=
+while sleep 1; do
+    m=$(stat -c %Y gen.py topology.py | tr '\n' ' ') && [ "$m" != "$last" ] || continue
+    last=$m
+    $PY topology.py 2>/dev/null && $PY gen.py && scp -q ../../grafana-dashboards/poco/poco.json poco_f5_pro-phone-hyperos:monitoring/dashboards/poco/poco.json && echo "live $(date +%T)"
+done
